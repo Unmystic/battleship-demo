@@ -30,7 +30,23 @@ test("adding ships with horizontal checks", () => {
     board.grid[2] = new Array(10).fill(1);
     expect(board.checkHorizontally(1, 2, 3)).toBe(false);
 });
-test("adding ships with horizontal checks", () => {
+test("adding ships with horizontal checks2", () => {
     const board = new GameBoard();
     expect(board.checkHorizontally(1, 2, 3)).toBe(true);
+});
+
+test("adding ships with vertical checks", () => {
+    const board = new GameBoard();
+    expect(board.checkVertically(1, 2, 3, "h")).toBe(true);
+});
+
+test("adding ships with vertical checks2", () => {
+    const board = new GameBoard();
+    board.grid[1][5] = 1;
+    expect(board.checkVertically(1, 2, 3, "h")).toBe(false);
+});
+test("adding ships with vertical checks3", () => {
+    const board = new GameBoard();
+    board.grid[2][1] = 1;
+    expect(board.checkVertically(1, 2, 3, "v")).toBe(false);
 });
