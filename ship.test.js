@@ -10,3 +10,11 @@ test("simulate ship hit", () => {
     ship.hit();
     expect(ship.numHits).toBe(1);
 });
+
+test("simulate ship sinking", () => {
+    const ship = new Ship();
+    for (let i = 0; i < ship.size; i++) {
+        ship.hit();
+    }
+    expect(ship.isSunk()).toBeTruthy();
+});

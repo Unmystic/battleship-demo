@@ -7,6 +7,9 @@ class Ship {
     hit() {
         this.numHits += 1;
     }
+    isSunk() {
+        return this.numHits >= this.size;
+    }
 }
 
 export { Ship };
