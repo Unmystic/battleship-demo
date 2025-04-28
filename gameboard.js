@@ -12,10 +12,26 @@ class GameBoard {
         this.ships.push(ship);
     }
 
-    checkHorizontally(row, col, size) {
-        for (let i = 0; i < size; i++) {
-            if (row - 1 >= 0 && this.grid[row - 1][col + i] === 1) return false;
-            if (row + 1 < 10 && this.grid[row + 1][col + i] === 1) return false;
+    canPlace(coords, size, placement = "h") {
+        const [row, col] = coords;
+        if (placement === "h" && col + size > 10) return false;
+        if (placement === "v" && row + size > 10) return false;
+        return (
+            this.checkHorizontally(row, col, size, placement) &&
+            this.checkVertically(row, col, size, placement)
+        );
+    }
+
+    checkHorizontally(row, col, size, placement = "h") {
+        if (placement === "h") {
+            for (let i = 0; i < size; i++) {
+                if (row - 1 >= 0 && this.grid[row - 1][col + i] === 1) return false;
+                if (row + 1 < 10 && this.grid[row + 1][col + i] === 1) return false;
+            }
+        }
+        if (placement === "v") {
+            if (row - 1 >= 0 && this.grid[row - 1][col] === 1) return false;
+            if (row + size < 10 && this.grid[row + size][col] === 1) return false;
         }
         return true;
     }
