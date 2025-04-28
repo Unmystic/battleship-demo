@@ -1,4 +1,5 @@
 import { GameBoard } from "./gameboard";
+import { Ship } from "./ship";
 
 test("check if gameboard is created", () => {
     const board = new GameBoard();
@@ -20,8 +21,42 @@ test("is ship in this coords2", () => {
 
 test("adding ships to the board", () => {
     const board = new GameBoard();
-    board.addShip("ship");
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
     expect(board.ships.length).toBe(1);
+});
+
+test("adding ships to the board2", () => {
+    const board = new GameBoard();
+    const ship = new Ship();
+    board.addShip([1, 1], ship, "h");
+    expect(board.grid[1][1]).toBe(1);
+    expect(board.grid[1][2]).toBe(1);
+    expect(board.grid[1][3]).toBe(1);
+});
+
+test("adding ships to the board3", () => {
+    const board = new GameBoard();
+    const ship = new Ship();
+    board.addShip([1, 1], ship, "v");
+    expect(board.grid[1][1]).toBe(1);
+    expect(board.grid[2][1]).toBe(1);
+    expect(board.grid[3][1]).toBe(1);
+});
+
+test("adding ships to the board4", () => {
+    const board = new GameBoard();
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    const res = {
+        ship: ship,
+        position: [
+            [0, 0],
+            [0, 1],
+            [0, 2],
+        ],
+    };
+    expect(board.ships[0]).toEqual(res);
 });
 
 test("adding ships with horizontal checks", () => {

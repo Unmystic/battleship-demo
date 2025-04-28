@@ -8,8 +8,24 @@ class GameBoard {
     checkCoords(row, col) {
         return this.grid[row][col] === 1;
     }
-    addShip(ship) {
-        this.ships.push(ship);
+    addShip(coords, ship, placement = "h") {
+        const [row, col] = coords;
+        const shipInfo = {
+            ship: ship,
+            position: [],
+        };
+        for (let i = 0; i < ship.size; i++) {
+            if (placement === "h") {
+                this.grid[row][col + i] = 1;
+                shipInfo.position.push([row, col + i]);
+            }
+            if (placement === "v") {
+                this.grid[row + i][col] = 1;
+                shipInfo.position.push([row + i, col]);
+            }
+        }
+
+        this.ships.push(shipInfo);
     }
 
     canPlace(coords, size, placement = "h") {
