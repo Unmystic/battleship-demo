@@ -50,12 +50,11 @@ test("adding ships to the board4", () => {
     board.addShip([0, 0], ship);
     const res = {
         ship: ship,
-        position: [
-            [0, 0],
-            [0, 1],
-            [0, 2],
-        ],
+        position: new Set(),
     };
+    res.position.add("0-0");
+    res.position.add("0-1");
+    res.position.add("0-2");
     expect(board.ships[0]).toEqual(res);
 });
 
@@ -103,4 +102,75 @@ test("can place ship2", () => {
 test("can place ship3", () => {
     const board = new GameBoard();
     expect(board.canPlace([8, 1], 3, "v")).toBe(false);
+});
+
+test("attack received", () => {
+    const board = new GameBoard();
+    board.receiveAttack([0, 1]);
+    expect(board.hittedPlaces.has("0-1")).toBe(true);
+});
+
+test("attack received2", () => {
+    const board = new GameBoard();
+    board.receiveAttack([0, 1]);
+    expect(board.hittedPlaces.has("0-2")).toBe(false);
+});
+
+test("ship hitted", () => {
+    const board = new GameBoard();
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    board.receiveAttack([0, 1]);
+    expect(ship.numHits).toBe(1);
+});
+test("ship missed", () => {
+    const board = new GameBoard();
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    board.receiveAttack([1, 0]);
+    expect(ship.numHits).toBe(0);
+});
+test("ship sunked", () => {
+    const board = new GameBoard();
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    board.receiveAttack([0, 1]);
+    board.receiveAttack([0, 2]);
+    board.receiveAttack([0, 0]);
+
+    expect(ship.isSunk()).toBe(true);
+});
+
+test("game is finished", () => {
+    const board = new GameBoard();
+
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    board.receiveAttack([0, 1]);
+    board.receiveAttack([0, 2]);
+    board.receiveAttack([0, 0]);
+
+    const ship2 = new Ship(2);
+    board.addShip([8, 8], ship2);
+    board.receiveAttack([8, 8]);
+    board.receiveAttack([8, 9]);
+
+    expect(board.isGameFinished()).toBe(true);
+});
+
+test("game is not finished", () => {
+    const board = new GameBoard();
+
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    board.receiveAttack([0, 1]);
+    board.receiveAttack([0, 2]);
+    board.receiveAttack([0, 0]);
+
+    const ship2 = new Ship(2);
+    board.addShip([8, 8], ship2);
+    board.receiveAttack([8, 8]);
+    board.receiveAttack([8, 7]);
+
+    expect(board.isGameFinished()).toBe(false);
 });

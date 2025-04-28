@@ -4,6 +4,7 @@ class GameBoard {
             Array.from({ length: 10 }, () => 0),
         );
         this.ships = [];
+        this.hittedPlaces = new Set();
     }
     checkCoords(row, col) {
         return this.grid[row][col] === 1;
@@ -12,16 +13,16 @@ class GameBoard {
         const [row, col] = coords;
         const shipInfo = {
             ship: ship,
-            position: [],
+            position: new Set(),
         };
         for (let i = 0; i < ship.size; i++) {
             if (placement === "h") {
                 this.grid[row][col + i] = 1;
-                shipInfo.position.push([row, col + i]);
+                shipInfo.position.add(`${row}-${col + i}`);
             }
             if (placement === "v") {
                 this.grid[row + i][col] = 1;
-                shipInfo.position.push([row + i, col]);
+                shipInfo.position.add(`${row + i}-${col}`);
             }
         }
 
@@ -64,6 +65,27 @@ class GameBoard {
             }
         }
         return true;
+    }
+
+    receiveAttack(coords) {
+        const strCoords = `${coords[0]}-${coords[1]}`;
+        if (this.hittedPlaces.has(strCoords)) return;
+        this.ships.forEach((s) => {
+            if (s.position.has(strCoords)) {
+                s.ship.hit();
+            }
+        });
+        this.hittedPlaces.add(strCoords);
+    }
+    isGameFinished() {
+        let gameStatus = true;
+        this.ships.forEach((s) => {
+            if (!s.ship.isSunk()) {
+                gameStatus = false;
+                return;
+            }
+        });
+        return gameStatus;
     }
 }
 
