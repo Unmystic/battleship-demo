@@ -1,0 +1,65 @@
+body {
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+}
+
+.gameCont {
+    display: grid;
+    grid-template-columns: repeat(10, 15px);
+    grid-template-rows: repeat(10, 15px);
+    justify-content: center;
+}
+
+.gameCont>div {
+    border: 1px solid black;
+    align-content: center;
+}
+
+h1 {
+    text-align: center;
+}
+
+.gameMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.gameControl {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 80px;
+}
+
+.gameControl>div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.gameControl div:first-child {
+    color: blue;
+}
+
+.gameControl div:last-child {
+    color: red;
+}
+
+.score {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+p {
+    margin: 0;
+}
+
+.sign {
+    font-size: 125px;
+    text-align: center;
+    font-weight: 400;
+}
