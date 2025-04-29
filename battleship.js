@@ -24,7 +24,8 @@ function createBoard(board, side = "left") {
 function setPlayers() {
     const player1 = new Player(true);
     const player2 = new Player(false);
-    player1.board.grid[0] = new Array(10).fill(1);
+    player1.placeShips();
+    player2.placeShips();
     createBoard(player1.board, "left");
     createBoard(player2.board, "right");
 }

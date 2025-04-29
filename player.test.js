@@ -9,3 +9,16 @@ test("check for homo", () => {
     const player = new Player(true);
     expect(player.isHuman).toBe(true);
 });
+describe("generate correct position", () => {
+    test("check coordinates length", () => {
+        const player = new Player();
+        const [coords, placement] = player.generatePosition();
+        expect(coords.length).toBe(2);
+    });
+
+    test("see if placement matches", () => {
+        const player = new Player();
+        const [coords, placement] = player.generatePosition();
+        expect(placement).toMatch(/(v|h)/i);
+    });
+});
