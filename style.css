@@ -4,16 +4,34 @@ body {
     height: 100vh;
 }
 
+.playField {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+}
+
 .gameCont {
     display: grid;
-    grid-template-columns: repeat(10, 15px);
-    grid-template-rows: repeat(10, 15px);
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(10, 20px);
     justify-content: center;
 }
 
+.leftBoard {
+    justify-content: end;
+}
+
+.rightBoard {
+    justify-content: start;
+}
+
 .gameCont>div {
-    border: 1px solid black;
+    border: 0.03rem solid black;
     align-content: center;
+}
+
+.ridge {
+    border: 1mm ridge #968ea4;
 }
 
 h1 {
