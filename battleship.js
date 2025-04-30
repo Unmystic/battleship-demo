@@ -12,7 +12,7 @@ function createBoard(board, side = "left") {
 
     for (let i = 0; i < grid.length; i++) {
         const cell = document.createElement("div");
-        cell.id = i;TODO padd the single digits
+        cell.id = i.toString().padStart(2, "0");
         gameCont.appendChild(cell);
         if (grid[i] === 1 && gameCont.classList.contains("leftBoard")) {
             cell.style.border = "0.75mm ridge #968ea4";
@@ -40,7 +40,8 @@ function attackCell(e, board) {
     if (cell.classList.contains("gameCont")) {
         return;
     }
-    if (cell.firstChild) {
+    if (cell.firstChild && cell.innerText != "X") {
+        console.log(cell, cell.firstChild.value);
         cell.removeChild(cell.querySelector("button"));
     }
     console.log(cell);
@@ -52,27 +53,32 @@ function checkBoard(cell, board) {
     const col = cell.id[1];
     if (board.grid[row][col] == 1) {
         cell.style.backgroundColor = "red";
+    } else {
+        cell.textContent = "X";
+        cell.classList.add("miss");
     }
     board.receiveAttack([row.col]);
     updateMoves(row, col, board);
 }
 
 function updateMoves(row, col, board) {
-    console.log(row, col);
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const cellAtt = board.grid[row][col];
-    document.querySelector(".playerMove > p").textContent =
-        letters[row] + nums[col];
-}
+    const moveLabel = document.querySelector(".playerText")
+    let result
+    if (board.checkCoords) {
 
-function setPlayers() {
-    const player1 = new Player(true);
-    const player2 = new Player(false);
-    player1.placeShips();
-    player2.placeShips();
-    createBoard(player1.board, "left");
-    createBoard(player2.board, "right");
-}
 
-setPlayers();
+        moveLabel.textContent = letters[row] + nums[col];
+    }
+
+    function setPlayers() {
+        const player1 = new Player(true);
+        const player2 = new Player(false);
+        player1.placeShips();
+        player2.placeShips();
+        createBoard(player1.board, "left");
+        createBoard(player2.board, "right");
+    }
+
+    setPlayers();

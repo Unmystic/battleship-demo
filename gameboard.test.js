@@ -174,3 +174,15 @@ test("game is not finished", () => {
 
     expect(board.isGameFinished()).toBe(false);
 });
+
+test("find hitted ship", () => {
+    const board = new GameBoard();
+
+    const ship = new Ship();
+    board.addShip([0, 0], ship);
+    board.receiveAttack([0, 1]);
+    const ship2 = new Ship(2);
+    board.addShip([8, 8], ship2);
+
+    expect(board.findShip([0, 1])).toEqual(ship);
+});

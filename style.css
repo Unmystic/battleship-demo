@@ -135,3 +135,9 @@ p {
     color: #606060;
     text-shadow: 0 1px #fff;
 }
+
+.miss {
+    color: grey;
+    font-weight: 100;
+    text-align: center;
+}

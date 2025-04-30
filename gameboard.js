@@ -87,6 +87,14 @@ class GameBoard {
         });
         return gameStatus;
     }
+    findShip(coords) {
+        const strCoords = `${coords[0]}-${coords[1]}`;
+        this.ships.forEach((s) => {
+            if (s.position.has(strCoords)) {
+                return s TODO: return hittes ship
+            }
+        });
+    }
 }
 
 export { GameBoard };
