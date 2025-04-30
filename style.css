@@ -76,7 +76,8 @@ h1 {
 .gameControl {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 80px;
+    gap: 20px;
+    align-items: center;
 }
 
 .gameControl>div {
@@ -94,9 +95,9 @@ h1 {
     color: red;
 }
 
-.score {
-    font-size: 22px;
-    font-weight: bold;
+.move {
+    font-size: 12px;
+    /*font-weight: bold;*/
 }
 
 p {

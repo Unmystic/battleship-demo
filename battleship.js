@@ -12,7 +12,7 @@ function createBoard(board, side = "left") {
 
     for (let i = 0; i < grid.length; i++) {
         const cell = document.createElement("div");
-        cell.id = i;
+        cell.id = i;TODO padd the single digits
         gameCont.appendChild(cell);
         if (grid[i] === 1 && gameCont.classList.contains("leftBoard")) {
             cell.style.border = "0.75mm ridge #968ea4";
@@ -28,21 +28,42 @@ function createBoard(board, side = "left") {
     }
     if (gameCont.classList.contains("rightBoard")) {
         gameCont.addEventListener("click", function(e) {
-            attackCell(e);
+            attackCell(e, board);
         });
     }
 }
 
-function attackCell(e) {
+function attackCell(e, board) {
     const target = e.target;
     console.log(target);
     let cell = target.closest("div");
     if (cell.classList.contains("gameCont")) {
-        cell = cell.firstChild;
+        return;
     }
     if (cell.firstChild) {
         cell.removeChild(cell.querySelector("button"));
     }
+    console.log(cell);
+    checkBoard(cell, board);
+}
+
+function checkBoard(cell, board) {
+    const row = cell.id[0];
+    const col = cell.id[1];
+    if (board.grid[row][col] == 1) {
+        cell.style.backgroundColor = "red";
+    }
+    board.receiveAttack([row.col]);
+    updateMoves(row, col, board);
+}
+
+function updateMoves(row, col, board) {
+    console.log(row, col);
+    const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const cellAtt = board.grid[row][col];
+    document.querySelector(".playerMove > p").textContent =
+        letters[row] + nums[col];
 }
 
 function setPlayers() {
