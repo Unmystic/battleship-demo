@@ -6,8 +6,8 @@ body {
 
 .playField {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    grid-template-columns: 10fr 1fr 10fr;
+    /*gap: 20px;*/
 }
 
 .gameCont {
@@ -15,6 +15,22 @@ body {
     grid-template-columns: repeat(10, 20px);
     grid-template-rows: repeat(10, 20px);
     justify-content: center;
+}
+
+.legend {
+    display: grid;
+    grid-template-rows: repeat(10, 20px);
+    align-items: center;
+    justify-items: center;
+}
+
+.letter {
+    height: 20px;
+    width: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    border-left: 0.03rem solid black;
+    border-right: 0.03rem solid grey;
 }
 
 .leftBoard {
@@ -28,6 +44,17 @@ body {
 .gameCont>div {
     border: 0.03rem solid black;
     align-content: center;
+}
+
+.numNum {
+    display: grid;
+    grid-template-columns: 10fr 1fr 10fr;
+}
+
+.oneTen {
+    display: grid;
+    grid-template-columns: repeat(10, 20px);
+    justify-items: center;
 }
 
 .ridge {
