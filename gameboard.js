@@ -69,10 +69,13 @@ class GameBoard {
 
     receiveAttack(coords) {
         const strCoords = `${coords[0]}-${coords[1]}`;
-        if (this.hittedPlaces.has(strCoords)) return;
-        this.ships.forEach((s) => {
+        if (this.hittedPlaces.has(strCoords)) {
+            return;
+        }
+        this.ships.forEach((s, index) => {
             if (s.position.has(strCoords)) {
-                s.ship.hit();
+                this.ships[index].ship.numHits += 1;
+                //s.ship.hit();
             }
         });
         this.hittedPlaces.add(strCoords);
@@ -88,12 +91,15 @@ class GameBoard {
         return gameStatus;
     }
     findShip(coords) {
+        let sh;
         const strCoords = `${coords[0]}-${coords[1]}`;
         this.ships.forEach((s) => {
             if (s.position.has(strCoords)) {
-                return s TODO: return hittes ship
+                sh = s.ship;
+                return;
             }
         });
+        return sh;
     }
 }
 

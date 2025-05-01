@@ -35,16 +35,13 @@ function createBoard(board, side = "left") {
 
 function attackCell(e, board) {
     const target = e.target;
-    console.log(target);
     let cell = target.closest("div");
     if (cell.classList.contains("gameCont")) {
         return;
     }
     if (cell.firstChild && cell.innerText != "X") {
-        console.log(cell, cell.firstChild.value);
         cell.removeChild(cell.querySelector("button"));
     }
-    console.log(cell);
     checkBoard(cell, board);
 }
 
@@ -57,28 +54,33 @@ function checkBoard(cell, board) {
         cell.textContent = "X";
         cell.classList.add("miss");
     }
-    board.receiveAttack([row.col]);
+    board.receiveAttack([row, col]);
     updateMoves(row, col, board);
 }
 
 function updateMoves(row, col, board) {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const moveLabel = document.querySelector(".playerText")
-    let result
-    if (board.checkCoords) {
-
-
-        moveLabel.textContent = letters[row] + nums[col];
+    const moveLabel = document.querySelector(".playerText");
+    let result = "";
+    if (board.checkCoords(row, col)) {
+        const ship = board.findShip([row, col]);
+        if (ship.isSunk()) {
+            result = "-- Ship SUNK";
+        } else result = "-- HIT";
     }
+    moveLabel.textContent =
+        result.length > 0
+            ? letters[row] + nums[col] + result
+            : letters[row] + nums[col] + " -- Miss";
+}
+function setPlayers() {
+    const player1 = new Player(true);
+    const player2 = new Player(false);
+    player1.placeShips();
+    player2.placeShips();
+    createBoard(player1.board, "left");
+    createBoard(player2.board, "right");
+}
 
-    function setPlayers() {
-        const player1 = new Player(true);
-        const player2 = new Player(false);
-        player1.placeShips();
-        player2.placeShips();
-        createBoard(player1.board, "left");
-        createBoard(player2.board, "right");
-    }
-
-    setPlayers();
+setPlayers();
