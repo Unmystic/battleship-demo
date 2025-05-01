@@ -1,7 +1,13 @@
+import { GameBoard } from "./gameboard.js";
 import { Player } from "./player.js";
 import { Ship } from "./ship.js";
 
 const gameCont = document.querySelectorAll(".gameCont");
+const playField = document.querySelector(".playField");
+const gameMsg = document.querySelector(".menuMsg");
+const leftBoard = document.querySelector(".leftBoard");
+const rightBoard = document.querySelector(".rightBoard");
+const btnReset = document.querySelector("#btnReset");
 
 function createBoard(board, side = "left") {
     const gameCont =
@@ -26,6 +32,7 @@ function createBoard(board, side = "left") {
             cell.appendChild(btn);
         }
     }
+
     if (gameCont.classList.contains("rightBoard")) {
         gameCont.addEventListener("click", function(e) {
             attackCell(e, board);
@@ -36,6 +43,7 @@ function createBoard(board, side = "left") {
 function attackCell(e, board) {
     const target = e.target;
     let cell = target.closest("div");
+    console.log(cell);
     if (cell.classList.contains("gameCont")) {
         return;
     }
@@ -73,6 +81,10 @@ function updateMoves(row, col, board) {
         result.length > 0
             ? letters[row] + nums[col] + result
             : letters[row] + nums[col] + " -- Miss";
+    if (board.isGameFinished()) {
+        gameMsg.textContent = "All ships are destroyed!";
+        document.querySelector(".rightBoard").style.pointerEvents = "none";
+    }
 }
 function setPlayers() {
     const player1 = new Player(true);
@@ -82,5 +94,17 @@ function setPlayers() {
     createBoard(player1.board, "left");
     createBoard(player2.board, "right");
 }
+
+btnReset.addEventListener("click", function() {
+    //rightBoard.style.pointerEvents = "auto";
+    //rightBoard.innerHTML = "";
+    playField.removeChild(document.querySelector(".rightBoard"));
+    const rb = document.createElement("div");
+    rb.classList.add("gameCont");
+    rb.classList.add("rightBoard");
+    playField.appendChild(rb);
+    leftBoard.innerHTML = "";
+    setPlayers();
+});
 
 setPlayers();
