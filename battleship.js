@@ -43,7 +43,6 @@ function createBoard(board, side = "left") {
 function attackCell(e, board) {
     const target = e.target;
     let cell = target.closest("div");
-    console.log(cell);
     if (cell.classList.contains("gameCont")) {
         return;
     }
@@ -104,6 +103,9 @@ btnReset.addEventListener("click", function() {
     rb.classList.add("rightBoard");
     playField.appendChild(rb);
     leftBoard.innerHTML = "";
+    gameMsg.textContent = "Click on cell to place a move";
+    document.querySelector(".playerText").textContent = "Waiting for the move";
+    document.querySelector(".compText").textContent = "No previous moves";
     setPlayers();
 });
 

@@ -1,4 +1,5 @@
-import { Player } from "./player";
+import { GameBoard } from "./gameboard";
+import { Computer, Player } from "./player";
 
 test("creating player with gameboard", () => {
     const player = new Player();
@@ -20,5 +21,37 @@ describe("generate correct position", () => {
         const player = new Player();
         const [coords, placement] = player.generatePosition();
         expect(placement).toMatch(/(v|h)/i);
+    });
+});
+
+describe("check for excluded cells", () => {
+    test("selected cell is in list", () => {
+        const machine = new Computer();
+        machine.excludedCells.add("0-1");
+        const compchoice = [0, 1];
+        expect(machine.checkEx(compchoice)).toBe(true);
+    });
+    test("selected cell not in list", () => {
+        const machine = new Computer();
+        machine.excludedCells.add("0-1");
+        const compchoice = [0, 2];
+        expect(machine.checkEx(compchoice)).toBe(false);
+    });
+});
+
+describe("computer ignored excluded cells", () => {
+    test.each(Array(100).fill())("random cell is not in list", () => {
+        const machine = new Computer();
+        machine.excludedCells.add("0-1");
+        machine.excludedCells.add("0-2");
+        machine.excludedCells.add("1-2");
+        machine.excludedCells.add("0-3");
+        machine.excludedCells.add("0-4");
+        machine.excludedCells.add("0-5");
+        machine.excludedCells.add("0-6");
+        machine.excludedCells.add("0-7");
+        machine.excludedCells.add("0-8");
+        const compchoice = machine.randomChoice();
+        expect(machine.checkEx(compchoice)).toBe(false);
     });
 });

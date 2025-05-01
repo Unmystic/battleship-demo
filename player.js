@@ -26,4 +26,21 @@ class Player {
     }
 }
 
-export { Player };
+class Computer extends Player {
+    constructor() {
+        super();
+        this.excludedCells = new Set();
+    }
+    checkEx(coords) {
+        const strCoords = `${coords[0]}-${coords[1]}`;
+        return this.excludedCells.has(strCoords);
+    }
+    randomChoice() {
+        const row = Math.floor(Math.random() * 10);
+        const col = Math.floor(Math.random() * 10);
+        if (this.checkEx([row, col])) return this.randomChoice();
+        return [row, col];
+    }
+}
+
+export { Player, Computer };
