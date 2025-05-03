@@ -10,6 +10,11 @@ test("check for homo", () => {
     const player = new Player(true);
     expect(player.isHuman).toBe(true);
 });
+
+test("correct coords stringification", () => {
+    const player = new Player();
+    expect(player.stringifyCoords([0, 1])).toBe("0-1");
+});
 describe("generate correct position", () => {
     test("check coordinates length", () => {
         const player = new Player();
@@ -26,13 +31,13 @@ describe("generate correct position", () => {
 
 describe("check for excluded cells", () => {
     test("selected cell is in list", () => {
-        const machine = new Computer();
+        const machine = new Computer("board");
         machine.excludedCells.add("0-1");
         const compchoice = [0, 1];
         expect(machine.checkEx(compchoice)).toBe(true);
     });
     test("selected cell not in list", () => {
-        const machine = new Computer();
+        const machine = new Computer("board");
         machine.excludedCells.add("0-1");
         const compchoice = [0, 2];
         expect(machine.checkEx(compchoice)).toBe(false);
@@ -41,7 +46,7 @@ describe("check for excluded cells", () => {
 
 describe("computer ignored excluded cells", () => {
     test.each(Array(100).fill())("random cell is not in list", () => {
-        const machine = new Computer();
+        const machine = new Computer("board");
         machine.excludedCells.add("0-1");
         machine.excludedCells.add("0-2");
         machine.excludedCells.add("1-2");
