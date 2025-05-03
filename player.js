@@ -49,7 +49,25 @@ class Computer extends Player {
     selectVector(coords) {
         const row = coords[0];
         const col = coords[1];
+        const directions = {
+            "-h": [0, -1],
+            "+h": [0, 1],
+            "-v": [-1, 0],
+            "+v": [1, 0],
+        };
+
+        for (const d of Object.values(directions)) {
+            const newRow = row + d[0];
+            const newCol = col + d[1];
+            if (
+                this.excludedCells.has(this.stringifyCoords([newRow, newCol])) &&
+                this.opponentBoard.grid[newRow][newCol] === 1
+            ) {
+                return Object.keys(directions).find((key) => directions[key] === d);
+            }
+        }
     }
+
     randomChoice() {
         const row = Math.floor(Math.random() * 10);
         const col = Math.floor(Math.random() * 10);
@@ -66,6 +84,27 @@ class Computer extends Player {
                 this.suggestedCells = [];
                 const ship = this.opponentBoard.findShip(cellCoords);
                 if (!ship.isSunk()) {
+                    const v = this.selectVector(cellCoords);
+                }
+            }
+        }
+    }
+
+    addSuggestions(vector, coord) {
+        const [row, col] = coord;
+        if (vector === "-h") {
+            if (
+                this.checkBoundaries([row, col + 1]) &&
+                !this.excludedCells.has(this.stringifyCoords([row, col + 1]))
+            )
+                this.suggestedCells.push([row, col + 1]);
+            for (let i = 2; i < 5; i++) {
+                if (
+                    this.checkBoundaries([row, col - i]) &&
+                    !this.excludedCells.has(this.stringifyCoords([row, col - i]))
+                ) {
+                    this.suggestedCells.push([row, col - i]);
+                    return;
                 }
             }
         }

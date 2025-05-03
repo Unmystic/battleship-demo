@@ -1,5 +1,6 @@
 import { GameBoard } from "./gameboard";
 import { Computer, Player } from "./player";
+import { Ship } from "./ship";
 
 test("creating player with gameboard", () => {
     const player = new Player();
@@ -58,5 +59,17 @@ describe("computer ignored excluded cells", () => {
         machine.excludedCells.add("0-8");
         const compchoice = machine.randomChoice();
         expect(machine.checkEx(compchoice)).toBe(false);
+    });
+});
+
+describe("computer makes a move", () => {
+    test("correct vectorization return", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([1, 1], ship, "h");
+        human.board.receiveAttack([1, 1]);
+        machine.excludedCells.add(machine.stringifyCoords([1, 1]));
+        expect(machine.selectVector([1, 2])).toBe("-h");
     });
 });
