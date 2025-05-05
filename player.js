@@ -108,6 +108,54 @@ class Computer extends Player {
                 }
             }
         }
+        if (vector === "+h") {
+            if (
+                this.checkBoundaries([row, col - 1]) &&
+                !this.excludedCells.has(this.stringifyCoords([row, col - 1]))
+            )
+                this.suggestedCells.push([row, col - 1]);
+            for (let i = 2; i < 5; i++) {
+                if (
+                    this.checkBoundaries([row, col + i]) &&
+                    !this.excludedCells.has(this.stringifyCoords([row, col + i]))
+                ) {
+                    this.suggestedCells.push([row, col + i]);
+                    return;
+                }
+            }
+        }
+        if (vector === "-v") {
+            if (
+                this.checkBoundaries([row + 1, col]) &&
+                !this.excludedCells.has(this.stringifyCoords([row + 1, col]))
+            )
+                this.suggestedCells.push([row + 1, col]);
+            for (let i = 2; i < 5; i++) {
+                if (
+                    this.checkBoundaries([row - i, col]) &&
+                    !this.excludedCells.has(this.stringifyCoords([row - i, col]))
+                ) {
+                    this.suggestedCells.push([row - i, col]);
+                    return;
+                }
+            }
+        }
+        if (vector === "+v") {
+            if (
+                this.checkBoundaries([row - 1, col]) &&
+                !this.excludedCells.has(this.stringifyCoords([row - 1, col]))
+            )
+                this.suggestedCells.push([row - 1, col]);
+            for (let i = 2; i < 5; i++) {
+                if (
+                    this.checkBoundaries([row + i, col]) &&
+                    !this.excludedCells.has(this.stringifyCoords([row + i, col]))
+                ) {
+                    this.suggestedCells.push([row + i, col]);
+                    return;
+                }
+            }
+        }
     }
 }
 

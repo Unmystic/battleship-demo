@@ -72,4 +72,70 @@ describe("computer makes a move", () => {
         machine.excludedCells.add(machine.stringifyCoords([1, 1]));
         expect(machine.selectVector([1, 2])).toBe("-h");
     });
+    test("correct move suggestions1", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([1, 1], ship, "h");
+        human.board.receiveAttack([1, 1]);
+        machine.excludedCells.add(machine.stringifyCoords([1, 1]));
+        machine.addSuggestions("-h", [1, 2]);
+        expect(machine.suggestedCells).toEqual([
+            [1, 3],
+            [1, 0],
+        ]);
+    });
+    test("correct move suggestions1", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([1, 1], ship, "h");
+        human.board.receiveAttack([1, 1]);
+        machine.excludedCells.add(machine.stringifyCoords([1, 1]));
+        machine.addSuggestions("-h", [1, 2]);
+        expect(machine.suggestedCells).toEqual([
+            [1, 3],
+            [1, 0],
+        ]);
+    });
+    test("correct move suggestions2", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([2, 2], ship, "h");
+        human.board.receiveAttack([2, 2]);
+        machine.excludedCells.add(machine.stringifyCoords([2, 2]));
+        machine.addSuggestions("+h", [2, 1]);
+        expect(machine.suggestedCells).toEqual([
+            [2, 0],
+            [2, 3],
+        ]);
+    });
+
+    test("correct move suggestions3", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([3, 3], ship, "v");
+        human.board.receiveAttack([3, 3]);
+        machine.excludedCells.add(machine.stringifyCoords([3, 3]));
+        machine.addSuggestions("-v", [4, 3]);
+        expect(machine.suggestedCells).toEqual([
+            [5, 3],
+            [2, 3],
+        ]);
+    });
+    test("correct move suggestions4", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([4, 4], ship, "v");
+        human.board.receiveAttack([4, 4]);
+        machine.excludedCells.add(machine.stringifyCoords([4, 4]));
+        machine.addSuggestions("+v", [3, 4]);
+        expect(machine.suggestedCells).toEqual([
+            [2, 4],
+            [5, 4],
+        ]);
+    });
 });
