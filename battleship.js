@@ -80,6 +80,7 @@ function updateMoves(row, col, board, cont = ".rightBoard") {
             : letters[row] + nums[col] + " -- Miss";
     if (board.isGameFinished()) {
         gameMsg.textContent = "All ships are destroyed!";
+        btnBotMove.disabled = true;
         document.querySelector(".rightBoard").style.pointerEvents = "none";
     }
 }
@@ -108,6 +109,7 @@ function setPlayers() {
     player2.placeShips();
     createBoard(player2.board, "right");
     btnBotMove.addEventListener("click", function() {
+        //console.log(document.querySelector(".compText").textContent);
         const [row, col] = player2.makeMove();
         updateMoves(row, col, player2.opponentBoard, ".leftBoard");
     });
@@ -116,6 +118,7 @@ function setPlayers() {
 btnReset.addEventListener("click", function() {
     //rightBoard.style.pointerEvents = "auto";
     //rightBoard.innerHTML = "";
+    btnBotMove.disabled = false;
     playField.removeChild(document.querySelector(".rightBoard"));
     const rb = document.createElement("div");
     rb.classList.add("gameCont");
