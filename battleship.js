@@ -1,5 +1,5 @@
 import { GameBoard } from "./gameboard.js";
-import { Player } from "./player.js";
+import { Computer, Player } from "./player.js";
 import { Ship } from "./ship.js";
 
 const gameCont = document.querySelectorAll(".gameCont");
@@ -8,6 +8,7 @@ const gameMsg = document.querySelector(".menuMsg");
 const leftBoard = document.querySelector(".leftBoard");
 const rightBoard = document.querySelector(".rightBoard");
 const btnReset = document.querySelector("#btnReset");
+const btnBotMove = document.querySelector("#btnBot");
 
 function createBoard(board, side = "left") {
     const gameCont =
@@ -55,27 +56,24 @@ function attackCell(e, board) {
 function checkBoard(cell, board) {
     const row = cell.id[0];
     const col = cell.id[1];
-    if (board.grid[row][col] == 1) {
-        cell.style.backgroundColor = "red";
-    } else {
-        cell.textContent = "X";
-        cell.classList.add("miss");
-    }
+    //if (board.grid[row][col] == 1) {
+    //    cell.style.backgroundColor = "red";
+    //} else {
+    //    cell.textContent = "X";
+    //    cell.classList.add("miss");
+    //}
     board.receiveAttack([row, col]);
     updateMoves(row, col, board);
 }
 
-function updateMoves(row, col, board) {
+function updateMoves(row, col, board, cont = ".rightBoard") {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const moveLabel = document.querySelector(".playerText");
-    let result = "";
-    if (board.checkCoords(row, col)) {
-        const ship = board.findShip([row, col]);
-        if (ship.isSunk()) {
-            result = "-- Ship SUNK";
-        } else result = "-- HIT";
-    }
+    const moveLabel =
+        cont === ".rightBoard"
+            ? document.querySelector(".playerText")
+            : document.querySelector(".compText");
+    const result = markShip(row, col, board, cont);
     moveLabel.textContent =
         result.length > 0
             ? letters[row] + nums[col] + result
@@ -85,13 +83,34 @@ function updateMoves(row, col, board) {
         document.querySelector(".rightBoard").style.pointerEvents = "none";
     }
 }
+
+function markShip(row, col, board, cont = ".rightBoard") {
+    let result = "";
+    const idx = `${row}${col}`;
+    const cell = document.querySelector(cont).querySelector(`[id="${idx}"]`);
+    if (board.checkCoords(row, col)) {
+        cell.style.backgroundColor = "red";
+        const ship = board.findShip([row, col]);
+        if (ship.isSunk()) {
+            result = "-- Ship SUNK";
+        } else result = "-- HIT";
+    } else {
+        cell.textContent = "X";
+        cell.classList.add("miss");
+    }
+    return result;
+}
 function setPlayers() {
     const player1 = new Player(true);
-    const player2 = new Player(false);
     player1.placeShips();
-    player2.placeShips();
     createBoard(player1.board, "left");
+    const player2 = new Computer(player1.board);
+    player2.placeShips();
     createBoard(player2.board, "right");
+    btnBotMove.addEventListener("click", function() {
+        const [row, col] = player2.makeMove();
+        updateMoves(row, col, player2.opponentBoard, ".leftBoard");
+    });
 }
 
 btnReset.addEventListener("click", function() {

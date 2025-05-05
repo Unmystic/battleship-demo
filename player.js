@@ -81,7 +81,8 @@ class Computer extends Player {
         return [row, col];
     }
     makeMove() {
-        if (this.suggestedCells) {
+        if (this.suggestedCells.length > 0) {
+            console.log(this.suggestedCells);
             const cellCoords = this.suggestedCells.pop();
             this.opponentBoard.receiveAttack(cellCoords);
             const strCoords = this.stringifyCoords(cellCoords);
@@ -94,12 +95,14 @@ class Computer extends Player {
                     this.addSuggestions(v, cellCoords);
                 }
             }
+            return cellCoords;
         } else {
             const randCoords = this.randomChoice();
             this.excludedCells.add(this.stringifyCoords(randCoords));
             if (this.opponentBoard.grid[randCoords[0]][randCoords[1]] === 1) {
                 this.fourSideAddition(randCoords);
             }
+            return randCoords;
         }
     }
     fourSideAddition(coords) {

@@ -73,6 +73,11 @@ h1 {
     margin-bottom: 30px;
 }
 
+button {
+    font-size: 20px;
+    height: 30px;
+}
+
 .gameControl {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -96,7 +101,7 @@ h1 {
 }
 
 .move {
-    font-size: 12px;
+    font-size: 22px;
     /*font-weight: bold;*/
 }
 
