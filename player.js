@@ -41,6 +41,12 @@ class Computer extends Player {
         this.opponentBoard = opponentBoard;
         this.excludedCells = new Set();
         this.suggestedCells = [];
+        this.directions = {
+            "-h": [0, -1],
+            "+h": [0, 1],
+            "-v": [-1, 0],
+            "+v": [1, 0],
+        };
     }
     checkEx(coords) {
         const strCoords = this.stringifyCoords(coords);
@@ -85,7 +91,25 @@ class Computer extends Player {
                 const ship = this.opponentBoard.findShip(cellCoords);
                 if (!ship.isSunk()) {
                     const v = this.selectVector(cellCoords);
+                    this.addSuggestions(v, cellCoords);
                 }
+            }
+        } else {
+            const randCoords = this.randomChoice();
+            this.excludedCells.add(this.stringifyCoords(randCoords));
+            if (this.opponentBoard.grid[randCoords[0]][randCoords[1]] === 1) {
+                this.fourSideAddition(randCoords);
+            }
+        }
+    }
+    fourSideAddition(coords) {
+        const [row, col] = coords;
+        for (const d of Object.values(this.directions)) {
+            if (
+                this.checkBoundaries([row + d[0], col + d[1]]) &&
+                !this.checkEx([row + d[0], col + d[1]])
+            ) {
+                this.suggestedCells.push([row + d[0], col + d[1]]);
             }
         }
     }
