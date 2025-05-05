@@ -139,3 +139,47 @@ describe("computer makes a move", () => {
         ]);
     });
 });
+
+describe("check random choice suggestions", () => {
+    test("mocking random choice to get suggestiond", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([4, 4], ship, "v");
+        const randomCoords = [4, 4];
+        machine.fourSideAddition(randomCoords);
+
+        expect(machine.suggestedCells).toEqual([
+            [4, 3],
+            [4, 5],
+            [3, 4],
+            [5, 4],
+        ]);
+    });
+    test("does not add visited cell", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([4, 4], ship, "v");
+        const randomCoords = [4, 4];
+        machine.excludedCells.add(machine.stringifyCoords([4, 3]));
+        machine.fourSideAddition(randomCoords);
+        expect(machine.suggestedCells).toEqual([
+            [4, 5],
+            [3, 4],
+            [5, 4],
+        ]);
+    });
+    test("does not add out of border cell", () => {
+        const human = new Player();
+        const machine = new Computer(human.board);
+        const ship = new Ship();
+        human.board.addShip([0, 0], ship, "v");
+        const randomCoords = [0, 0];
+        machine.fourSideAddition(randomCoords);
+        expect(machine.suggestedCells).toEqual([
+            [0, 1],
+            [1, 0],
+        ]);
+    });
+});

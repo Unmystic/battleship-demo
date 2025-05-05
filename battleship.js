@@ -21,7 +21,7 @@ function createBoard(board, side = "left") {
         cell.id = i.toString().padStart(2, "0");
         gameCont.appendChild(cell);
         if (grid[i] === 1 && gameCont.classList.contains("leftBoard")) {
-            cell.style.border = "0.75mm ridge #968ea4";
+            cell.style.border = "1.75mm ridge #968ea4";
             cell.style.boxSizing = "border-box";
             //cell.style.margin = "1mm";
             cell.classList.add("ridge");
