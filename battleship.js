@@ -8,7 +8,8 @@ const gameMsg = document.querySelector(".menuMsg");
 const leftBoard = document.querySelector(".leftBoard");
 const rightBoard = document.querySelector(".rightBoard");
 const btnReset = document.querySelector("#btnReset");
-const btnBotMove = document.querySelector("#btnBot");
+let whoMoves = 0;
+const timeToMove = new CustomEvent("botTime");
 
 function createBoard(board, side = "left") {
     const gameCont =
@@ -42,15 +43,17 @@ function createBoard(board, side = "left") {
 }
 
 function attackCell(e, board) {
-    const target = e.target;
-    let cell = target.closest("div");
-    if (cell.classList.contains("gameCont")) {
-        return;
+    if (!whoMoves) {
+        const target = e.target;
+        let cell = target.closest("div");
+        if (cell.classList.contains("gameCont")) {
+            return;
+        }
+        if (cell.firstChild && cell.innerText != "X") {
+            cell.removeChild(cell.querySelector("button"));
+        }
+        checkBoard(cell, board);
     }
-    if (cell.firstChild && cell.innerText != "X") {
-        cell.removeChild(cell.querySelector("button"));
-    }
-    checkBoard(cell, board);
 }
 
 function checkBoard(cell, board) {
@@ -80,8 +83,14 @@ function updateMoves(row, col, board, cont = ".rightBoard") {
             : letters[row] + nums[col] + " -- Miss";
     if (board.isGameFinished()) {
         gameMsg.textContent = "All ships are destroyed!";
-        btnBotMove.disabled = true;
         document.querySelector(".rightBoard").style.pointerEvents = "none";
+    } else if (!board.checkCoords(row, col)) {
+        whoMoves = whoMoves === 0 ? 1 : 0;
+    }
+    if (whoMoves && !board.isGameFinished()) {
+        gameMsg.dispatchEvent(
+            new timeToMove.constructor(timeToMove.type, timeToMove),
+        );
     }
 }
 
@@ -101,6 +110,14 @@ function markShip(row, col, board, cont = ".rightBoard") {
     }
     return result;
 }
+
+function botMove(computer) {
+    if (whoMoves) {
+        const [row, col] = computer.makeMove();
+        console.log(`Bot attacks row : ${row} , col ${col}`);
+        updateMoves(row, col, computer.opponentBoard, ".leftBoard");
+    }
+}
 function setPlayers() {
     const player1 = new Player(true);
     player1.placeShips();
@@ -108,17 +125,15 @@ function setPlayers() {
     const player2 = new Computer(player1.board);
     player2.placeShips();
     createBoard(player2.board, "right");
-    btnBotMove.addEventListener("click", function() {
-        //console.log(document.querySelector(".compText").textContent);
-        const [row, col] = player2.makeMove();
-        updateMoves(row, col, player2.opponentBoard, ".leftBoard");
+
+    gameMsg.addEventListener("botTime", function() {
+        botMove(player2);
     });
 }
 
 btnReset.addEventListener("click", function() {
     //rightBoard.style.pointerEvents = "auto";
     //rightBoard.innerHTML = "";
-    btnBotMove.disabled = false;
     playField.removeChild(document.querySelector(".rightBoard"));
     const rb = document.createElement("div");
     rb.classList.add("gameCont");
