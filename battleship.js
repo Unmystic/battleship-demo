@@ -131,6 +131,56 @@ function setPlayers() {
     });
 }
 
+//<div class="shipyard" >
+//  <div class="verticalRow">
+//    <div class="ship vertical" draggable="true">
+//      <div class="ridge"></div>
+//      <div class="ridge"></div>
+//      <div class="ridge"></div>
+//      <div class="ridge"></div>
+//      <div class="ridge"></div>
+//    </div>
+
+function createShipyard() {
+    const shipyard = document.createElement("div");
+    shipyard.classList.add("shipyard");
+    const horizRow = document.createElement("div");
+    horizRow.classList.add("horizontalRow");
+    const vertRow = document.createElement("div");
+    vertRow.classList.add("verticalRow");
+    shipyard.appendChild(vertRow);
+    shipyard.appendChild(horizRow);
+
+    const shipsSizes = [5, 4, 3, 3, 1];
+
+    for (const size of shipsSizes) {
+        const ship = document.createElement("div");
+        vertRow.appendChild(ship);
+        ship.draggable = true;
+        ship.classList.add("ship", "vertical");
+        ship.style.height = `${size * 30}px`;
+        for (let i = 0; i < size; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("ridge");
+            ship.appendChild(cell);
+        }
+    }
+    for (const size of shipsSizes) {
+        const ship = document.createElement("div");
+        horizRow.appendChild(ship);
+        ship.draggable = true;
+        ship.classList.add("ship", "horizontal");
+        ship.style.width = `${size * 30}px`;
+        for (let i = 0; i < size; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("ridge");
+            ship.appendChild(cell);
+        }
+    }
+
+    document.querySelector("body").appendChild(shipyard);
+}
+
 btnReset.addEventListener("click", function() {
     //rightBoard.style.pointerEvents = "auto";
     //rightBoard.innerHTML = "";
@@ -147,3 +197,4 @@ btnReset.addEventListener("click", function() {
 });
 
 setPlayers();
+createShipyard();

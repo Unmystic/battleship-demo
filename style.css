@@ -2,6 +2,10 @@ body {
     margin: 0;
     width: 100%;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .playField {
@@ -22,6 +26,11 @@ body {
     grid-template-rows: repeat(10, 30px);
     align-items: center;
     justify-items: center;
+}
+
+.menuMsg {
+    font-size: 26px;
+    font-weight: bold;
 }
 
 .letter {
@@ -57,8 +66,44 @@ body {
     justify-items: center;
 }
 
+.shipyard {
+    width: 800px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+    border: 2px solid black;
+    margin-bottom: 50px;
+    background-color: #fff7f1;
+}
+
+.verticalRow,
+.horizontalRow {
+    display: grid;
+    grid-template-columns: repeat(5, 160px);
+    justify-items: center;
+    padding: 10px;
+    border: 1px solid gray;
+}
+
+.vertical {
+    display: grid;
+    grid-template-rows: repeat(auto-fit, minmax(20px, 30px));
+    width: 30px;
+}
+
+.horizontal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20px, 30px));
+    height: 30px;
+}
+
 .ridge {
-    border: 1mm ridge #968ea4;
+    border: 1.75mm ridge rgb(150, 142, 164);
+    width: 30px;
+    width: 30px;
+    box-sizing: border-box;
 }
 
 h1 {
