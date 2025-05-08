@@ -22,12 +22,46 @@ function createBoard(board, side = "left") {
         const cell = document.createElement("div");
         cell.id = i.toString().padStart(2, "0");
         gameCont.appendChild(cell);
-        if (grid[i] === 1 && gameCont.classList.contains("leftBoard")) {
-            cell.style.border = "1.75mm ridge #968ea4";
-            cell.style.boxSizing = "border-box";
-            //cell.style.margin = "1mm";
-            cell.classList.add("ridge");
+        if (gameCont.classList.contains("leftBoard")) {
+            cell.addEventListener("dragover", (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                ev.dataTransfer.dropEffect = "move";
+            });
+            cell.addEventListener("dragenter", (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                const data = document.querySelector(".dragInfo").textContent;
+                cell.classList.toggle("hover");
+                //console.log(cellHList(cell.id, data));
+                const cellList = cellHList(cell.id, data);
+                for (const c of cellList) {
+                    c.classList.toggle("hover");
+                }
+            });
+            cell.addEventListener("dragleave", (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                cell.classList.toggle("hover");
+                const data = document.querySelector(".dragInfo").textContent;
+                const cellList = cellHList(cell.id, data);
+                for (const c of cellList) {
+                    c.classList.toggle("hover");
+                }
+            });
+
+            cell.addEventListener("drop", (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                const data = ev.dataTransfer.getData("text/plain");
+            });
         }
+        //if (grid[i] === 1 && gameCont.classList.contains("leftBoard")) {
+        //    cell.style.border = "1.75mm ridge #968ea4";
+        //    cell.style.boxSizing = "border-box";
+        //    //cell.style.margin = "1mm";
+        //    cell.classList.add("ridge");
+        //}
         if (gameCont.classList.contains("rightBoard")) {
             const btn = document.createElement("button");
             btn.classList.add("btnGrid");
@@ -37,9 +71,55 @@ function createBoard(board, side = "left") {
 
     if (gameCont.classList.contains("rightBoard")) {
         gameCont.addEventListener("click", function(e) {
+            e.preventDefault();
             attackCell(e, board);
         });
     }
+}
+
+function cellHList(cellId, data) {
+    console.log(cellId);
+    const [shipId, off] = data.split("-");
+    const [size, direction] = [...shipId];
+    const cellList = [];
+    if (direction == "v") {
+        for (let i = off; i < size; i++) {
+            const newRow = parseInt(cellId[0]) + (size - i);
+            const newId = `${newRow}${cellId[1]}`;
+            console.log("Verticaд +", newId);
+            if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
+                cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
+            }
+        }
+        for (let i = off - 1; i > 0; i--) {
+            const newRow = parseInt(cellId[0]) - i;
+            const newId = `${newRow}${cellId[1]}`;
+            console.log("vertical --", newId);
+            if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
+                cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
+            }
+        }
+    }
+    if (direction == "h") {
+        for (let i = off; i < size; i++) {
+            const newCol = parseInt(cellId[1]) + (size - i);
+            const newId = `${cellId[0]}${newCol}`;
+            console.log("Horizontal++", newId);
+            if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
+                cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
+            }
+        }
+        for (let i = off - 1; i > 0; i--) {
+            const newCol = parseInt(cellId[1]) - i;
+            const newId = `${cellId[0]}${newCol}`;
+            console.log("horizontal --", newId);
+            if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
+                cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
+            }
+        }
+    }
+    console.log(cellList);
+    return cellList;
 }
 
 function attackCell(e, board) {
@@ -150,6 +230,7 @@ function createShipyard() {
     vertRow.classList.add("verticalRow");
     shipyard.appendChild(vertRow);
     shipyard.appendChild(horizRow);
+    let idCount = 420;
 
     const shipsSizes = [5, 4, 3, 3, 1];
 
@@ -157,11 +238,17 @@ function createShipyard() {
         const ship = document.createElement("div");
         vertRow.appendChild(ship);
         ship.draggable = true;
-        ship.classList.add("ship", "vertical");
+        const idx = size + "v";
+        if (vertRow.querySelector(`#${CSS.escape(idx)}`)) {
+            ship.id = idx + 1;
+        } else ship.id = idx;
+        ship.classList.add("ship", "vertical", "draggable");
         ship.style.height = `${size * 30}px`;
         for (let i = 0; i < size; i++) {
             const cell = document.createElement("div");
             cell.classList.add("ridge");
+            cell.id = idCount;
+            idCount += 1;
             ship.appendChild(cell);
         }
     }
@@ -169,17 +256,51 @@ function createShipyard() {
         const ship = document.createElement("div");
         horizRow.appendChild(ship);
         ship.draggable = true;
-        ship.classList.add("ship", "horizontal");
+        const idx = size + "h";
+        if (vertRow.querySelector(`#${CSS.escape(idx)}`)) {
+            ship.id = idx + 1;
+        } else ship.id = idx;
+        ship.classList.add("ship", "horizontal", "draggable");
         ship.style.width = `${size * 30}px`;
         for (let i = 0; i < size; i++) {
             const cell = document.createElement("div");
             cell.classList.add("ridge");
+            cell.id = idCount;
+            idCount += 1;
             ship.appendChild(cell);
         }
     }
 
+    const draggables = Array.from(shipyard.querySelectorAll(".draggable"));
+    draggables.forEach((draggable) => {
+        draggable.addEventListener("dragstart", (ev) => {
+            console.log("dragging", ev.target);
+            let offset;
+            if (draggable.id[1] === "v") {
+                console.log("OffsetY: " + ev.offsetY);
+                offset = Math.trunc(ev.offsetY / 30) + 1;
+            } else {
+                console.log("OffsetX: " + ev.offsetX);
+                offset = Math.trunc(ev.offsetX / 30) + 1;
+            }
+            ev.stopPropagation();
+            document.querySelector(".dragInfo").textContent =
+                `${draggable.id}-${offset}`;
+            ev.dataTransfer.setData("text/plain", `${draggable.id}-${offset}`);
+            ev.dataTransfer.dropEffect = "move";
+            draggable.classList.add("dragging");
+        });
+        draggable.addEventListener("dragend", (ev) => {
+            console.log("stopped dragging", ev.target);
+            ev.stopPropagation();
+            draggable.classList.remove("dragging");
+        });
+    });
+
     document.querySelector("body").appendChild(shipyard);
 }
+
+function calculateOffset(off) { }
 
 btnReset.addEventListener("click", function() {
     //rightBoard.style.pointerEvents = "auto";
