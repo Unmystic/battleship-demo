@@ -54,14 +54,21 @@ function createBoard(board, side = "left") {
                 ev.stopPropagation();
                 ev.preventDefault();
                 const data = ev.dataTransfer.getData("text/plain");
+                const cellList = cellHList(cell.id, data);
+                cell.classList.remove("hover");
+                cellList.forEach((c) => c.classList.remove("hover"));
+                if (canDrop(cell.id, data, board)) {
+                    console.log(board);
+                    cell.style.border = "1.75mm ridge #968ea4";
+                    cell.style.boxSizing = "border-box";
+                    for (const c of cellList) {
+                        c.style.border = "1.75mm ridge #968ea4";
+                        c.style.boxSizing = "border-box";
+                    }
+                } else console.log("Cannot drop", [cell, cellList, board]);
             });
         }
-        //if (grid[i] === 1 && gameCont.classList.contains("leftBoard")) {
-        //    cell.style.border = "1.75mm ridge #968ea4";
-        //    cell.style.boxSizing = "border-box";
-        //    //cell.style.margin = "1mm";
-        //    cell.classList.add("ridge");
-        //}
+
         if (gameCont.classList.contains("rightBoard")) {
             const btn = document.createElement("button");
             btn.classList.add("btnGrid");
@@ -75,6 +82,37 @@ function createBoard(board, side = "left") {
             attackCell(e, board);
         });
     }
+}
+
+function canDrop(cellId, data, board) {
+    const [shipId, off] = data.split("-");
+    const [size, direction] = [...shipId];
+    let startCoords;
+    if (direction === "v") {
+        startCoords = [parseInt(cellId[0]) - (off - 1), parseInt(cellId[1])];
+    }
+    if (direction === "h") {
+        startCoords = [parseInt(cellId[0]), parseInt(cellId[1] - (off - 1))];
+    }
+    console.log("Starting coordinats are: ", startCoords);
+    if (board.canPlace(startCoords, parseInt(size), direction)) {
+        board.addShip(startCoords, new Ship(parseInt(size)), direction);
+        removeElements(shipId, direction);
+        return true;
+    }
+
+    return false;
+}
+
+function removeElements(shipId, direction) {
+    const element = document.querySelector(`#${CSS.escape(shipId)}`);
+    element.parentElement.removeChild(element);
+    let revertId = [...shipId];
+    revertId[1] = direction === "v" ? "h" : "v";
+    revertId = revertId.join("");
+    const revertEl = document.querySelector(`#${CSS.escape(revertId)}`);
+    console.log(revertEl, revertId);
+    revertEl.parentElement.removeChild(revertEl);
 }
 
 function cellHList(cellId, data) {
@@ -200,7 +238,7 @@ function botMove(computer) {
 }
 function setPlayers() {
     const player1 = new Player(true);
-    player1.placeShips();
+    //player1.placeShips();
     createBoard(player1.board, "left");
     const player2 = new Computer(player1.board);
     player2.placeShips();
@@ -232,7 +270,7 @@ function createShipyard() {
     shipyard.appendChild(horizRow);
     let idCount = 420;
 
-    const shipsSizes = [5, 4, 3, 3, 1];
+    const shipsSizes = [5, 4, 3, 3, 2];
 
     for (const size of shipsSizes) {
         const ship = document.createElement("div");
@@ -257,7 +295,7 @@ function createShipyard() {
         horizRow.appendChild(ship);
         ship.draggable = true;
         const idx = size + "h";
-        if (vertRow.querySelector(`#${CSS.escape(idx)}`)) {
+        if (horizRow.querySelector(`#${CSS.escape(idx)}`)) {
             ship.id = idx + 1;
         } else ship.id = idx;
         ship.classList.add("ship", "horizontal", "draggable");

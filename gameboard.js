@@ -31,6 +31,7 @@ class GameBoard {
 
     canPlace(coords, size, placement = "h") {
         const [row, col] = coords;
+        if (row < 0 || col < 0) return false;
         if (placement === "h" && col + size > 10) return false;
         if (placement === "v" && row + size > 10) return false;
         return (
