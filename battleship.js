@@ -8,6 +8,7 @@ const gameMsg = document.querySelector(".menuMsg");
 const leftBoard = document.querySelector(".leftBoard");
 const rightBoard = document.querySelector(".rightBoard");
 const btnReset = document.querySelector("#btnReset");
+const btnStart = document.querySelector("#btnStart");
 let whoMoves = 0;
 const timeToMove = new CustomEvent("botTime");
 
@@ -28,45 +29,50 @@ function createBoard(board, side = "left") {
                 ev.preventDefault();
                 ev.dataTransfer.dropEffect = "move";
             });
-            cell.addEventListener("dragenter", (ev) => {
-                ev.stopPropagation();
-                ev.preventDefault();
-                const data = document.querySelector(".dragInfo").textContent;
-                cell.classList.toggle("hover");
-                //console.log(cellHList(cell.id, data));
-                const cellList = cellHList(cell.id, data);
-                for (const c of cellList) {
-                    c.classList.toggle("hover");
-                }
-            });
-            cell.addEventListener("dragleave", (ev) => {
-                ev.stopPropagation();
-                ev.preventDefault();
-                cell.classList.toggle("hover");
-                const data = document.querySelector(".dragInfo").textContent;
-                const cellList = cellHList(cell.id, data);
-                for (const c of cellList) {
-                    c.classList.toggle("hover");
-                }
-            });
+            cell.addEventListener("dragenter", dragEnterHandler);
+            cell.addEventListener("dragleave", dragLeaveHandler);
 
-            cell.addEventListener("drop", (ev) => {
+            // Store drop listener on cell with board parameter
+            cell.dropListener = (ev) => {
                 ev.stopPropagation();
                 ev.preventDefault();
                 const data = ev.dataTransfer.getData("text/plain");
                 const cellList = cellHList(cell.id, data);
+
                 cell.classList.remove("hover");
                 cellList.forEach((c) => c.classList.remove("hover"));
+
                 if (canDrop(cell.id, data, board)) {
-                    console.log(board);
+                    // board is captured in closure
                     cell.style.border = "1.75mm ridge #968ea4";
                     cell.style.boxSizing = "border-box";
-                    for (const c of cellList) {
+                    cellList.forEach((c) => {
                         c.style.border = "1.75mm ridge #968ea4";
                         c.style.boxSizing = "border-box";
-                    }
-                } else console.log("Cannot drop", [cell, cellList, board]);
-            });
+                    });
+                    readyToStart();
+                }
+            };
+            cell.addEventListener("drop", cell.dropListener);
+            //
+            //cell.addEventListener("drop", (ev) => {
+            //    ev.stopPropagation();
+            //    ev.preventDefault();
+            //    const data = ev.dataTransfer.getData("text/plain");
+            //    const cellList = cellHList(cell.id, data);
+            //    cell.classList.remove("hover");
+            //    cellList.forEach((c) => c.classList.remove("hover"));
+            //    if (canDrop(cell.id, data, board)) {
+            //        console.log(board);
+            //        cell.style.border = "1.75mm ridge #968ea4";
+            //        cell.style.boxSizing = "border-box";
+            //        for (const c of cellList) {
+            //            c.style.border = "1.75mm ridge #968ea4";
+            //            c.style.boxSizing = "border-box";
+            //        }
+            //    } else console.log("Cannot drop", [cell, cellList, board]);
+            //    readyToStart();
+            //});
         }
 
         if (gameCont.classList.contains("rightBoard")) {
@@ -81,6 +87,33 @@ function createBoard(board, side = "left") {
             e.preventDefault();
             attackCell(e, board);
         });
+    }
+}
+
+function dragEnterHandler(ev) {
+    console.log("dragEnter", ev.currentTarget);
+    const cell = ev.currentTarget;
+    ev.stopPropagation();
+    ev.preventDefault();
+    const data = document.querySelector(".dragInfo").textContent;
+    cell.classList.toggle("hover");
+    //console.log(cellHList(cell.id, data));
+    const cellList = cellHList(cell.id, data);
+    for (const c of cellList) {
+        c.classList.toggle("hover");
+    }
+}
+
+function dragLeaveHandler(ev) {
+    console.log("dragLeave");
+    const cell = ev.currentTarget;
+    ev.stopPropagation();
+    ev.preventDefault();
+    cell.classList.toggle("hover");
+    const data = document.querySelector(".dragInfo").textContent;
+    const cellList = cellHList(cell.id, data);
+    for (const c of cellList) {
+        c.classList.toggle("hover");
     }
 }
 
@@ -106,11 +139,13 @@ function canDrop(cellId, data, board) {
 
 function removeElements(shipId, direction) {
     const element = document.querySelector(`#${CSS.escape(shipId)}`);
+    element.draggable = false;
     element.parentElement.removeChild(element);
     let revertId = [...shipId];
     revertId[1] = direction === "v" ? "h" : "v";
     revertId = revertId.join("");
     const revertEl = document.querySelector(`#${CSS.escape(revertId)}`);
+    revertEl.draggable = false;
     console.log(revertEl, revertId);
     revertEl.parentElement.removeChild(revertEl);
 }
@@ -158,6 +193,25 @@ function cellHList(cellId, data) {
     }
     console.log(cellList);
     return cellList;
+}
+
+function readyToStart() {
+    const shipyard = document.querySelector(".shipyard");
+    if (shipyard.firstChild.children.length === 0) {
+        // removent highlighting cell elements
+        const cells = Array.from(leftBoard.querySelectorAll("div"));
+        cells.forEach((element) => {
+            element.removeEventListener("dragenter", dragEnterHandler);
+            element.removeEventListener("dragleave", dragLeaveHandler);
+            if (element.dropListener) {
+                element.removeEventListener("drop", element.dropListener);
+                delete element.dropListener; // Clean up the property
+            }
+        });
+        btnStart.disabled = false;
+        document.querySelector("body").removeChild(shipyard);
+        gameMsg.textContent = "Press start to begin!";
+    }
 }
 
 function attackCell(e, board) {
