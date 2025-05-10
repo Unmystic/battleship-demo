@@ -54,25 +54,6 @@ function createBoard(board, side = "left") {
                 }
             };
             cell.addEventListener("drop", cell.dropListener);
-            //
-            //cell.addEventListener("drop", (ev) => {
-            //    ev.stopPropagation();
-            //    ev.preventDefault();
-            //    const data = ev.dataTransfer.getData("text/plain");
-            //    const cellList = cellHList(cell.id, data);
-            //    cell.classList.remove("hover");
-            //    cellList.forEach((c) => c.classList.remove("hover"));
-            //    if (canDrop(cell.id, data, board)) {
-            //        console.log(board);
-            //        cell.style.border = "1.75mm ridge #968ea4";
-            //        cell.style.boxSizing = "border-box";
-            //        for (const c of cellList) {
-            //            c.style.border = "1.75mm ridge #968ea4";
-            //            c.style.boxSizing = "border-box";
-            //        }
-            //    } else console.log("Cannot drop", [cell, cellList, board]);
-            //    readyToStart();
-            //});
         }
 
         if (gameCont.classList.contains("rightBoard")) {
@@ -83,15 +64,16 @@ function createBoard(board, side = "left") {
     }
 
     if (gameCont.classList.contains("rightBoard")) {
-        gameCont.addEventListener("click", function(e) {
+        gameCont.attackHandler = (e) => {
             e.preventDefault();
+            console.log("Click", gameCont);
             attackCell(e, board);
-        });
+        };
+        gameCont.addEventListener("click", gameCont.attackHandler);
     }
 }
 
 function dragEnterHandler(ev) {
-    console.log("dragEnter", ev.currentTarget);
     const cell = ev.currentTarget;
     ev.stopPropagation();
     ev.preventDefault();
@@ -105,7 +87,6 @@ function dragEnterHandler(ev) {
 }
 
 function dragLeaveHandler(ev) {
-    console.log("dragLeave");
     const cell = ev.currentTarget;
     ev.stopPropagation();
     ev.preventDefault();
@@ -146,12 +127,10 @@ function removeElements(shipId, direction) {
     revertId = revertId.join("");
     const revertEl = document.querySelector(`#${CSS.escape(revertId)}`);
     revertEl.draggable = false;
-    console.log(revertEl, revertId);
     revertEl.parentElement.removeChild(revertEl);
 }
 
 function cellHList(cellId, data) {
-    console.log(cellId);
     const [shipId, off] = data.split("-");
     const [size, direction] = [...shipId];
     const cellList = [];
@@ -159,7 +138,6 @@ function cellHList(cellId, data) {
         for (let i = off; i < size; i++) {
             const newRow = parseInt(cellId[0]) + (size - i);
             const newId = `${newRow}${cellId[1]}`;
-            console.log("Verticaд +", newId);
             if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
                 cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
             }
@@ -167,7 +145,6 @@ function cellHList(cellId, data) {
         for (let i = off - 1; i > 0; i--) {
             const newRow = parseInt(cellId[0]) - i;
             const newId = `${newRow}${cellId[1]}`;
-            console.log("vertical --", newId);
             if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
                 cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
             }
@@ -177,7 +154,6 @@ function cellHList(cellId, data) {
         for (let i = off; i < size; i++) {
             const newCol = parseInt(cellId[1]) + (size - i);
             const newId = `${cellId[0]}${newCol}`;
-            console.log("Horizontal++", newId);
             if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
                 cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
             }
@@ -185,13 +161,11 @@ function cellHList(cellId, data) {
         for (let i = off - 1; i > 0; i--) {
             const newCol = parseInt(cellId[1]) - i;
             const newId = `${cellId[0]}${newCol}`;
-            console.log("horizontal --", newId);
             if (leftBoard.querySelector(`#${CSS.escape(newId)}`)) {
                 cellList.push(leftBoard.querySelector(`#${CSS.escape(newId)}`));
             }
         }
     }
-    console.log(cellList);
     return cellList;
 }
 
@@ -231,12 +205,7 @@ function attackCell(e, board) {
 function checkBoard(cell, board) {
     const row = cell.id[0];
     const col = cell.id[1];
-    //if (board.grid[row][col] == 1) {
-    //    cell.style.backgroundColor = "red";
-    //} else {
-    //    cell.textContent = "X";
-    //    cell.classList.add("miss");
-    //}
+
     board.receiveAttack([row, col]);
     updateMoves(row, col, board);
 }
@@ -254,6 +223,7 @@ function updateMoves(row, col, board, cont = ".rightBoard") {
             ? letters[row] + nums[col] + result
             : letters[row] + nums[col] + " -- Miss";
     if (board.isGameFinished()) {
+        console.log(board);
         gameMsg.textContent = "All ships are destroyed!";
         document.querySelector(".rightBoard").style.pointerEvents = "none";
     } else if (!board.checkCoords(row, col)) {
@@ -286,32 +256,32 @@ function markShip(row, col, board, cont = ".rightBoard") {
 function botMove(computer) {
     if (whoMoves) {
         const [row, col] = computer.makeMove();
-        console.log(`Bot attacks row : ${row} , col ${col}`);
         updateMoves(row, col, computer.opponentBoard, ".leftBoard");
     }
 }
+
 function setPlayers() {
     const player1 = new Player(true);
     //player1.placeShips();
     createBoard(player1.board, "left");
-    const player2 = new Computer(player1.board);
-    player2.placeShips();
-    createBoard(player2.board, "right");
 
-    gameMsg.addEventListener("botTime", function() {
-        botMove(player2);
-    });
+    // Store the handler on the button itself
+    btnStart.startClickHandler = () => {
+        btnStart.disabled = true;
+        const player2 = new Computer(player1.board);
+
+        player2.placeShips();
+        createBoard(player2.board, "right");
+        console.log(player1.board.grid, player2.board.grid);
+
+        gameMsg.botTimeHandler = function() {
+            botMove(player2);
+        };
+        gameMsg.addEventListener("botTime", gameMsg.botTimeHandler);
+    };
+
+    btnStart.addEventListener("click", btnStart.startClickHandler);
 }
-
-//<div class="shipyard" >
-//  <div class="verticalRow">
-//    <div class="ship vertical" draggable="true">
-//      <div class="ridge"></div>
-//      <div class="ridge"></div>
-//      <div class="ridge"></div>
-//      <div class="ridge"></div>
-//      <div class="ridge"></div>
-//    </div>
 
 function createShipyard() {
     const shipyard = document.createElement("div");
@@ -366,13 +336,10 @@ function createShipyard() {
     const draggables = Array.from(shipyard.querySelectorAll(".draggable"));
     draggables.forEach((draggable) => {
         draggable.addEventListener("dragstart", (ev) => {
-            console.log("dragging", ev.target);
             let offset;
             if (draggable.id[1] === "v") {
-                console.log("OffsetY: " + ev.offsetY);
                 offset = Math.trunc(ev.offsetY / 30) + 1;
             } else {
-                console.log("OffsetX: " + ev.offsetX);
                 offset = Math.trunc(ev.offsetX / 30) + 1;
             }
             ev.stopPropagation();
@@ -383,7 +350,6 @@ function createShipyard() {
             draggable.classList.add("dragging");
         });
         draggable.addEventListener("dragend", (ev) => {
-            console.log("stopped dragging", ev.target);
             ev.stopPropagation();
             draggable.classList.remove("dragging");
         });
@@ -392,11 +358,22 @@ function createShipyard() {
     document.querySelector("body").appendChild(shipyard);
 }
 
-function calculateOffset(off) { }
-
 btnReset.addEventListener("click", function() {
-    //rightBoard.style.pointerEvents = "auto";
-    //rightBoard.innerHTML = "";
+    if (btnStart.startClickHandler) {
+        btnStart.removeEventListener("click", btnStart.startClickHandler);
+        delete btnStart.startClickHandler;
+    }
+    if (rightBoard.attackHandler) {
+        console.log("dfsd");
+        rightBoard.removeEventListener("click", rightBoard.attackHandler);
+        delete rightBoard.attackHandler;
+    }
+    if (gameMsg.botTimeHandler) {
+        gameMsg.removeEventListener("botTime", gameMsg.botTimeHandler);
+        delete gameMsg.botTimeHandler;
+    }
+
+    whoMoves = 0;
     playField.removeChild(document.querySelector(".rightBoard"));
     const rb = document.createElement("div");
     rb.classList.add("gameCont");
@@ -407,6 +384,7 @@ btnReset.addEventListener("click", function() {
     document.querySelector(".playerText").textContent = "Waiting for the move";
     document.querySelector(".compText").textContent = "No previous moves";
     setPlayers();
+    createShipyard();
 });
 
 setPlayers();
