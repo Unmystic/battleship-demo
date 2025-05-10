@@ -11,6 +11,8 @@ const btnReset = document.querySelector("#btnReset");
 const btnStart = document.querySelector("#btnStart");
 let whoMoves = 0;
 const timeToMove = new CustomEvent("botTime");
+const playerText = document.querySelector(".playerText");
+const compText = document.querySelector(".compText");
 
 function createBoard(board, side = "left") {
     const gameCont =
@@ -66,7 +68,6 @@ function createBoard(board, side = "left") {
     if (gameCont.classList.contains("rightBoard")) {
         gameCont.attackHandler = (e) => {
             e.preventDefault();
-            console.log("Click", gameCont);
             attackCell(e, board);
         };
         gameCont.addEventListener("click", gameCont.attackHandler);
@@ -223,8 +224,11 @@ function updateMoves(row, col, board, cont = ".rightBoard") {
             ? letters[row] + nums[col] + result
             : letters[row] + nums[col] + " -- Miss";
     if (board.isGameFinished()) {
-        console.log(board);
         gameMsg.textContent = "All ships are destroyed!";
+        moveLabel.textContent = "WINNER!";
+        if (playerText.textContent === "WINNER!") {
+            compText.textContent = "LOSER!";
+        } else playerText.textContent = "LOSER!";
         document.querySelector(".rightBoard").style.pointerEvents = "none";
     } else if (!board.checkCoords(row, col)) {
         whoMoves = whoMoves === 0 ? 1 : 0;
@@ -272,7 +276,6 @@ function setPlayers() {
 
         player2.placeShips();
         createBoard(player2.board, "right");
-        console.log(player1.board.grid, player2.board.grid);
 
         gameMsg.botTimeHandler = function() {
             botMove(player2);
@@ -364,13 +367,17 @@ btnReset.addEventListener("click", function() {
         delete btnStart.startClickHandler;
     }
     if (rightBoard.attackHandler) {
-        console.log("dfsd");
         rightBoard.removeEventListener("click", rightBoard.attackHandler);
         delete rightBoard.attackHandler;
     }
     if (gameMsg.botTimeHandler) {
         gameMsg.removeEventListener("botTime", gameMsg.botTimeHandler);
         delete gameMsg.botTimeHandler;
+    }
+    if (document.querySelector(".shipyard")) {
+        document
+            .querySelector("body")
+            .removeChild(document.querySelector(".shipyard"));
     }
 
     whoMoves = 0;
@@ -385,6 +392,7 @@ btnReset.addEventListener("click", function() {
     document.querySelector(".compText").textContent = "No previous moves";
     setPlayers();
     createShipyard();
+    gameMsg.textContent = "Place 5 ships on the grid!";
 });
 
 setPlayers();
